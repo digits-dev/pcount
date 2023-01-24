@@ -555,6 +555,23 @@
                             $.playSound(ASSET_URL+'sounds/success.ogg');
                             $("#revised_qty_"+edited_item).val($("#revised_qty").val());
                             $("#remarks_"+edited_item).val($("#remarks").val());
+
+                            //update temp table
+                            $.ajax({
+                                url:"{{ route('count.update-temp-line-revised') }}",
+                                type:"POST",
+                                dataType: "json",
+                                data: {
+                                    _token: "{{ csrf_token() }}",
+                                    line_id: $("#item_line_id"+edited_item).val(),
+                                    revised_qty: $("#revised_qty").val(),
+                                    remarks: $("#remarks").val(),
+                                },
+                                success:function(data) {
+                                    console.log(data);
+                                }
+                            });
+
                             $("#passcode").val('');
                             $("#revised_qty").val('');
                             $("#remarks").val('');
@@ -635,6 +652,22 @@
                     getTotalComputations();
                     $('.scanqty' + new_item_code).css('background-color', 'yellow');
                     resetItemSearch();
+
+                    $.ajax({
+                        url:"{{ route('count.save-temp-line') }}",
+                        type:"POST",
+                        dataType: "json",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            count_header: $("#header_id").val(),
+                            item_code: new_item_code,
+                            line_color: "#0000FF",
+                            qty: 1,
+                        },
+                        success:function(data) {
+                            $("#item_line_id"+new_item_code).val(data);
+                        }
+                    });
 
                     $("#new_item_passcode").val('');
                     $("#new_item_code").val('');

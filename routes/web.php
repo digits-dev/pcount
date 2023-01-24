@@ -41,3 +41,5 @@ Route::post('admin/save-temp-header', [CountTempHeaderController::class, 'saveCo
 Route::post('admin/get-temp-header', [CountTempHeaderController::class, 'getCountHeaders'])->name('count.get-temp-header');
 Route::post('admin/save-temp-lines', [CountTempLineController::class, 'saveCountLines'])->name('count.save-temp-line');
 Route::post('admin/update-temp-lines', [CountTempLineController::class, 'updateItemQty'])->name('count.update-temp-line');
+Route::post('admin/update-temp-revised-lines', [CountTempLineController::class, 'updateItemRevisedQty'])->name('count.update-temp-line-revised');
+
