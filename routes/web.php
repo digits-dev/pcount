@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminCmsUsersController;
 use App\Http\Controllers\AdminCountHeadersController;
 use App\Http\Controllers\AdminCountTypesController;
 use App\Http\Controllers\AdminItemsController;
@@ -43,3 +44,6 @@ Route::post('admin/save-temp-lines', [CountTempLineController::class, 'saveCount
 Route::post('admin/update-temp-lines', [CountTempLineController::class, 'updateItemQty'])->name('count.update-temp-line');
 Route::post('admin/update-temp-revised-lines', [CountTempLineController::class, 'updateItemRevisedQty'])->name('count.update-temp-line-revised');
 
+Route::get('admin/users/get-import', [AdminCmsUsersController::class, 'getImport'])->name('users.get-import');
+Route::get('admin/users/get-template', [AdminCmsUsersController::class, 'getTemplate'])->name('users.get-template');
+Route::post('admin/users/import', [AdminCmsUsersController::class, 'importUsers'])->name('users.import');

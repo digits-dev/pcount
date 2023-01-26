@@ -1,10 +1,15 @@
 <?php namespace App\Http\Controllers;
 
+use App\Exports\ExcelTemplateExport;
+use App\Imports\UserImport;
 use Session;
-use Request;
+use Illuminate\Http\Request;
 use DB;
-use CRUDbooster;
+use CRUDBooster;
 use crocodicstudio\crudbooster\controllers\CBController;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
+use Maatwebsite\Excel\Imports\HeadingRowFormatter;
 
 class AdminCmsUsersController extends CBController {
 
@@ -39,6 +44,11 @@ class AdminCmsUsersController extends CBController {
 		$this->form[] = array("label"=>"Password","name"=>"password", 'width'=>'col-sm-5', "type"=>"password","help"=>"Please leave empty if not changed");
 		# END FORM DO NOT REMOVE THIS LINE
 
+        $this->index_button = array();
+        if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+            $this->index_button[] = ['label'=>'Import Users','url'=> route('users.get-import'),'icon'=>'fa fa-upload','color'=>'info'];
+        }
+
 	}
 
 	public function getProfile() {
@@ -61,4 +71,72 @@ class AdminCmsUsersController extends CBController {
 	public function hook_before_add(&$postdata) {
 
 	}
+
+    public function getImport()
+    {
+        if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
+            CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+        }
+
+        $data = [];
+        $data['page_title'] = 'Import Users';
+        $data['uploadRoute'] = route('users.import');
+        $data['uploadTemplate'] = route('users.get-template');
+        return view('users.upload',$data);
+    }
+
+    public function getTemplate()
+    {
+        $header = array();
+        $header[0] = ['NAME','USER NAME', 'EMAIL ADDRESS', 'PRIVILEGE', 'STATUS'];
+        $header[1] = ['USER','ACC-1-1-1','user@pcount.com','SCANNER','ACTIVE'];
+        $export = new ExcelTemplateExport([$header]);
+        return Excel::download($export, 'users-'.date("Ymd").'-'.date("h.i.sa").'.csv');
+    }
+
+    public function importUsers(Request $request)
+    {
+        $errors = array();
+        $path_excel = $request->file('import_file')->store('temp');
+        $path = storage_path('app').'/'.$path_excel;
+        HeadingRowFormatter::default('none');
+        $headings = (new HeadingRowImport)->toArray($path);
+        $excelData = Excel::toArray(new UserImport, $path);
+
+        $header = array('NAME','USER NAME', 'EMAIL ADDRESS', 'PRIVILEGE', 'STATUS');
+
+        for ($i=0; $i < sizeof($headings[0][0]); $i++) {
+            if (!in_array($headings[0][0][$i], $header)) {
+                $unMatch[] = $headings[0][0][$i];
+            }
+        }
+
+        if(!empty($unMatch)) {
+            return redirect()->back()->with(['message_type' => 'danger', 'message' => 'Failed ! Please check template headers, mismatched detected.']);
+        }
+
+        $users = array_unique(array_column($excelData[0], "user_name"));
+        $tags = array_unique(array_column($excelData[0], "category_tag"));
+        $uploaded_tags = array_column($excelData[0], "category_tag");
+
+        if(count((array)$uploaded_tags) != count((array)$tags)){
+            array_push($errors, 'duplicate item found!');
+        }
+
+        foreach ($users as $key => $value) {
+            $userExist = DB::table('cms_users')->where('user_name',$value)->first();
+
+            if(!is_null($userExist)){
+                array_push($errors, 'no user found!');
+            }
+        }
+
+        if(!empty($errors)){
+            return redirect(CRUDBooster::mainpath())->with(['message_type' => 'danger', 'message' => 'Failed ! Please check '.implode(", ",$errors)]);
+        }
+
+        HeadingRowFormatter::default('slug');
+        Excel::import(new UserImport, $path);
+        return redirect(CRUDBooster::mainpath())->with(['message_type' => 'success', 'message' => 'Upload complete!']);
+    }
 }
