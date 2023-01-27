@@ -20,7 +20,7 @@
     </div>
     <div class='panel-body'>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="table-responsive">
                 <table class="table table-bordered" id="scan-details-1">
                     <tbody>
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="table-responsive">
                 <table class="table table-bordered" id="scan-details-2">
                     <tbody>
@@ -66,6 +66,33 @@
                             </td>
                             <td>
                                 {{ $header->scan_at }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="scan-details-3">
+                    <tbody>
+                        <tr>
+                            <td style="width: 25%">
+                                <b>Verified By:</b>
+                            </td>
+                            <td>
+                                {{ $header->verify_by }}
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                            <td style="width: 25%">
+                                <b>Verified Date:</b>
+                            </td>
+                            <td>
+                                {{ $header->verify_at }}
                             </td>
                         </tr>
                     </tbody>

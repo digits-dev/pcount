@@ -18,7 +18,11 @@ class CountHeader extends Model
         'warehouse_categories_id',
         'total_qty',
         'audited_by',
-        'audited_at'
+        'audited_at',
+        'created_by',
+        'created_at',
+        'updated_by',
+        'updated_at'
     ];
 
     public static function boot()

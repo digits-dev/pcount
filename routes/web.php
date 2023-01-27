@@ -24,7 +24,7 @@ Route::get('/', function () {
     return redirect('/admin/login');
 });
 
-
+Route::get('admin/count_headers/print/{id}', [AdminCountHeadersController::class, 'getPrint'])->name('count.print');
 Route::get('admin/count_headers/scan', [AdminCountHeadersController::class, 'getScan'])->name('count.scan');
 Route::post('admin/count_headers/save', [AdminCountHeadersController::class, 'saveScan'])->name('count.save-scan');
 Route::post('admin/count_headers/export', [AdminCountHeadersController::class, 'countExport'])->name('count.export');

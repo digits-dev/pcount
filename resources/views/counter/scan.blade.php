@@ -2,6 +2,7 @@
 @section('content')
 
 @push('head')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.css" integrity="sha256-F2TGXW+mc8e56tXYBFYeucG/SgD6qQt4SNFxmpVXdUk=" crossorigin="anonymous">
 <style>
     .swal2-popup {
@@ -25,18 +26,18 @@
             <input type="hidden" name="count_type" id="count_type" value="{{ $count_type->id }}">
             <input type="hidden" id="header_id" name="temp_headers_id" value="{{ ($headers != null) ? $headers->id : '' }}">
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <b>Scan Item Code</b>
                 <div class='form-group'>
                     <input type="text" class="form-control" id="item_search" disabled="disabled">
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <b>Category</b>
                 <div class='form-group'>
 
-                    <select name="warehouse_category" id="category" class="form-control category" title="Category">
+                    <select name="warehouse_category" id="category" class="form-control category" required title="Category">
                         <option value="">Please select category</option>
                         @foreach ($categories as $category)
                             @if($headers != null)
@@ -49,15 +50,27 @@
                 </div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <b>Count Tag</b>
                 <div class='form-group'>
 
-                    <select name="category_tag" id="category_tag" class="form-control category_tag" title="Count Tag">
+                    <select name="category_tag" id="category_tag" class="form-control category_tag" required title="Count Tag">
                         <option value="">Please select count tag</option>
                         @if ($headers != null)
                             <option selected value="{{ $headers->category_tag_number }}">{{ $headers->category_tag_number }}</option>
                         @endif
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <b>Verifier</b>
+                <div class='form-group'>
+                    <select name="verified_by" id="verifier" class="form-control verifier" required title="Verifier">
+                        <option value="">Please select verifier</option>
+                        @foreach ($verifiers as $verifier)
+                            <option value="{{ $verifier->id }}">{{ $verifier->name }}</option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -207,7 +220,7 @@
         integrity="sha512-37T7leoNS06R80c8Ulq7cdCDU5MNQBwlYoy1TX/WUsLFC2eYNqtKlV0QjH7r8JpG/S0GUMZwebnVFLPd6SU5yg=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
-    <script src='<?php echo asset("vendor/crudbooster/assets/select2/dist/js/select2.full.min.js")?>'></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src='https://cdn.rawgit.com/admsev/jquery-play-sound/master/jquery.playSound.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.js" integrity="sha256-CT21YfDe01wscF4AKCPn7mDQEHR2OC49jQZkt5wtl0g=" crossorigin="anonymous"></script>
     <script>
@@ -276,7 +289,7 @@
                     },
                     success:function(data) {
                         if(data == 1){
-                            $("#item_search").removeAttr('disabled');
+
                             $(".category_tag option:not(:selected)").prop('disabled', true);
                             //save headers
                             $.ajax({
@@ -300,6 +313,15 @@
                     }
 
                 });
+
+            });
+
+            $("#verifier").change(function(){
+                let sel_verifier = $(this).val();
+                if(sel_verifier != ''){
+                    $("#item_search").removeAttr('disabled');
+                    $(".verifier option:not(:selected)").prop('disabled', true);
+                }
 
             });
 
@@ -448,18 +470,29 @@
 
             $("#btnSubmit").click(function(event) {
                 event.preventDefault();
-                Swal.fire({
-                title: 'Do you want to save the changes?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Save',
-                cancelButtonText: 'Cancel',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $(this).prop("disabled", true);
-                        $("#count-scan").submit();
-                    }
-                });
+
+                let rowCount = parseInt($('#scan-items tr.nr').length);
+
+                if(rowCount == 0){
+                    Swal.fire('Warning!','Please scan at least 1 item!','warning');
+                    return false;
+                }
+
+                if($("#count-scan").valid()){
+
+                    Swal.fire({
+                    title: 'Do you want to save the changes?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Save',
+                    cancelButtonText: 'Cancel',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $(this).prop("disabled", true);
+                            $("#count-scan").submit();
+                        }
+                    });
+                }
 
             });
         });
@@ -740,10 +773,6 @@
 
     function clearInputs(){
         resetItemSearch();
-    }
-
-    function saveTempLines(item_code){
-
     }
 
     </script>
