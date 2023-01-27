@@ -54,7 +54,7 @@
                 <b>Count Tag</b>
                 <div class='form-group'>
 
-                    <select name="category_tag" id="category_tag" class="form-control category_tag" required title="Count Tag">
+                    <select name="category_tag" id="category_tag" class="form-control category_tag" required title="Count Tag" disabled>
                         <option value="">Please select count tag</option>
                         @if ($headers != null)
                             <option selected value="{{ $headers->category_tag_number }}">{{ $headers->category_tag_number }}</option>
@@ -66,7 +66,7 @@
             <div class="col-md-3">
                 <b>Verifier</b>
                 <div class='form-group'>
-                    <select name="verified_by" id="verifier" class="form-control verifier" required title="Verifier">
+                    <select name="verified_by" id="verifier" class="form-control verifier" style="width: 100%" required title="Verifier" disabled>
                         <option value="">Please select verifier</option>
                         @foreach ($verifiers as $verifier)
                             <option value="{{ $verifier->id }}">{{ $verifier->name }}</option>
@@ -236,6 +236,8 @@
 
                 if($("#header_id").val() != ''){
                     $("#item_search").removeAttr('disabled');
+                    $("#category_tag").removeAttr('disabled');
+                    $("#verifier").removeAttr('disabled');
                     getTotalComputations();
                 }
 
@@ -271,7 +273,7 @@
                 });
 
                 $(".category option:not(:selected)").prop('disabled', true);
-
+                $("#category_tag").removeAttr('disabled');
             });
 
             $("#category_tag").change(function(){
@@ -304,6 +306,7 @@
                                 },
                                 success:function(data) {
                                     $("#header_id").val(data);
+                                    $("#verifier").removeAttr('disabled');
                                 }
                             });
                         }
@@ -318,7 +321,7 @@
 
             $("#verifier").change(function(){
                 let sel_verifier = $(this).val();
-                if(sel_verifier != ''){
+                if(sel_verifier != '' && $("#category_tag").val() != '' && $("#category").val() != '' ){
                     $("#item_search").removeAttr('disabled');
                     $(".verifier option:not(:selected)").prop('disabled', true);
                 }

@@ -28,7 +28,8 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
             'WH CATEGORY',
             'QTY',
             'REVISED QTY',
-            'REMARKS'
+            'REMARKS',
+            'FINAL QTY'
         ];
     }
 
@@ -47,7 +48,8 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
             $counts->item_category,
             $counts->qty,
             $counts->revised_qty,
-            $counts->line_remarks
+            $counts->line_remarks,
+            ($counts->revised_qty != '') ? $counts->revised_qty : $counts->qty
         ];
     }
 
