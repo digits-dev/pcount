@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use CRUDBooster;
 
 class CountExport implements FromQuery, WithHeadings, WithMapping
 {
@@ -20,6 +21,8 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
             'TOTAL QTY',
             'SCANNED BY',
             'SCANNED DATE',
+            'VERIFIED BY',
+            'VERIFIED DATE',
             'ITEM CODE',
             'ITEM DESCRIPTION',
             'WH CATEGORY',
@@ -37,6 +40,8 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
             $counts->total_qty,
             $counts->scan_by,
             $counts->scan_at,
+            $counts->verify_by,
+            $counts->verify_at,
             $counts->item_code,
             $counts->item_description,
             $counts->item_category,
@@ -52,6 +57,7 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
             ->join('count_types','count_headers.count_types_id','=','count_types.id')
             ->join('warehouse_categories','count_headers.warehouse_categories_id','warehouse_categories.id')
             ->join('cms_users as scanby','count_headers.created_by','scanby.id')
+            ->join('cms_users as verifyby','count_headers.updated_by','verifyby.id')
             ->leftJoin('count_lines','count_headers.id','=','count_lines.count_headers_id')
             ->leftJoin('items','count_lines.item_code','=','items.digits_code')
             ->leftJoin('warehouse_categories as item_category','items.warehouse_categories_id','=','item_category.id')
@@ -63,6 +69,8 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
                 'count_headers.total_qty',
                 'scanby.name as scan_by',
                 'count_headers.created_at as scan_at',
+                'verifyby.name as verify_by',
+                'count_headers.updated_at as verify_at',
                 'count_lines.item_code',
                 'count_lines.qty',
                 'count_lines.revised_qty',
@@ -71,6 +79,13 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
                 'items.item_description',
                 'item_category.warehouse_category_description as item_category'
             );
+
+        if(in_array(CRUDBooster::myPrivilegeName(), ["Scanner","Counter"])){
+            $counts->where('count_headers.created_by',CRUDBooster::myId());
+        }
+        if(in_array(CRUDBooster::myPrivilegeName(), ["Verifier"])){
+            $counts->where('count_headers.updated_by',CRUDBooster::myId());
+        }
 
         if (request()->has('filter_column')) {
             $filter_column = request()->filter_column;

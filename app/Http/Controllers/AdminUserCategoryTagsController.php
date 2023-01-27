@@ -2,7 +2,8 @@
 
     use App\Exports\ExcelTemplateExport;
     use App\Imports\UserCategoryTagImport;
-    use App\Models\UserCategoryTag;
+use App\Models\User;
+use App\Models\UserCategoryTag;
     use Session;
 	use DB;
 	use CRUDBooster;
@@ -404,11 +405,17 @@
 
         public function getCategoryTagByCategory(Request $request)
         {
-            return UserCategoryTag::where('warehouse_categories_id',$request->category)
+            $userName = User::where('id',CRUDBooster::myId())->first();
+            $category_tags = UserCategoryTag::where('warehouse_categories_id',$request->category)
                 ->where('is_used',0)
-                ->where('status','ACTIVE')
-                ->select('category_tag_number')
-                ->get();
+                ->where('status','ACTIVE');
+
+            if(CRUDBooster::myPrivilegeName() == "Scanner"){
+                $category_tags->where('user_name',$userName->user_name);
+            }
+
+            $category_tags->select('category_tag_number')->orderBy('category_tag_number','ASC');
+            return $category_tags->get();
         }
 
         public function setUsedCategoryTag(Request $request)

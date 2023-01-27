@@ -7,8 +7,10 @@ use App\Models\CountTempHeader;
 use App\Models\CountTempLine;
 use App\Models\CountType;
     use App\Models\Item;
-    use App\Models\UserCategoryTag;
-    use App\Models\WarehouseCategory;
+use App\Models\User;
+use App\Models\UserCategoryTag;
+use App\Models\UserPrivilege;
+use App\Models\WarehouseCategory;
     use Session;
     use Illuminate\Http\Request;
 	use DB;
@@ -85,7 +87,7 @@ use App\Models\CountType;
 	        |
 	        */
 	        $this->addaction = array();
-
+            $this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('print').'/[id]','icon'=>'fa fa-print','color'=>'info'];
 
 	        /*
 	        | ----------------------------------------------------------------------
@@ -276,7 +278,12 @@ use App\Models\CountType;
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-
+            if(in_array(CRUDBooster::myPrivilegeName(), ["Scanner","Counter"])){
+                $query->where('count_headers.created_by',CRUDBooster::myId());
+            }
+            if(in_array(CRUDBooster::myPrivilegeName(), ["Verifier"])){
+                $query->where('count_headers.updated_by',CRUDBooster::myId());
+            }
 	    }
 
 	    /*
@@ -364,7 +371,7 @@ use App\Models\CountType;
 
         public function getDetail($id)
         {
-            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_edit==FALSE) {
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE || $this->button_detail==FALSE) {
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
             }
 
@@ -373,7 +380,8 @@ use App\Models\CountType;
             $data['header'] = CountHeader::where('count_headers.id',$id)
             ->join('count_types','count_headers.count_types_id','count_types.id')
             ->join('warehouse_categories','count_headers.warehouse_categories_id','warehouse_categories.id')
-            ->join('cms_users as scanby','count_headers.created_by','scanby.id')
+            ->leftJoin('cms_users as scanby','count_headers.created_by','scanby.id')
+            ->leftJoin('cms_users as verifyby','count_headers.updated_by','verifyby.id')
             ->select(
                 'count_headers.id',
                 'count_types.count_type_code',
@@ -381,7 +389,9 @@ use App\Models\CountType;
                 'warehouse_categories.warehouse_category_description',
                 'count_headers.total_qty',
                 'scanby.name as scan_by',
-                'count_headers.created_at as scan_at'
+                'count_headers.created_at as scan_at',
+                'verifyby.name as verify_by',
+                'count_headers.updated_at as verify_at'
             )->first();
 
             $data['items'] = CountLine::where('count_lines.count_headers_id',$id)
@@ -394,6 +404,41 @@ use App\Models\CountType;
             return view('counter.detail',$data);
         }
 
+        public function getPrint($id)
+        {
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+
+            $data = [];
+            $data['page_title'] = 'Print Count Details';
+            $data['header'] = CountHeader::where('count_headers.id',$id)
+            ->join('count_types','count_headers.count_types_id','count_types.id')
+            ->join('warehouse_categories','count_headers.warehouse_categories_id','warehouse_categories.id')
+            ->leftJoin('cms_users as scanby','count_headers.created_by','scanby.id')
+            ->leftJoin('cms_users as verifyby','count_headers.updated_by','verifyby.id')
+            ->select(
+                'count_headers.id',
+                'count_types.count_type_code',
+                'count_headers.category_tag_number',
+                'warehouse_categories.warehouse_category_description',
+                'count_headers.total_qty',
+                'scanby.name as scan_by',
+                'count_headers.created_at as scan_at',
+                'verifyby.name as verify_by',
+                'count_headers.updated_at as verify_at'
+            )->first();
+
+            $data['items'] = CountLine::where('count_lines.count_headers_id',$id)
+            ->join('items','count_lines.item_code','items.digits_code')
+            ->join('warehouse_categories','items.warehouse_categories_id','warehouse_categories.id')
+            ->select('count_lines.*','items.item_description','warehouse_categories.warehouse_category_description')
+            ->get();
+
+            $data['sku_count'] = CountLine::where('count_lines.count_headers_id',$id)->count();
+            return view('counter.print',$data);
+        }
+
         public function getScan()
         {
             if(!CRUDBooster::isCreate() && $this->global_privilege==FALSE || $this->button_add==FALSE) {
@@ -402,14 +447,24 @@ use App\Models\CountType;
 
             $data = [];
             $data['page_title'] = 'Scan Items';
+            $userName = User::where('id',CRUDBooster::myId())->first();
 
             $data['count_type'] = CountType::where('status','ACTIVE')->first();
 
-            $data['category_tags'] = UserCategoryTag::where('status','ACTIVE')
-                ->where('is_used',0)
+            $category_tags = UserCategoryTag::where('status','ACTIVE')->where('is_used',0);
+
+            if(CRUDBooster::myPrivilegeName() == "Scanner"){
+                $category_tags->where('user_name',$userName->user_name);
+            }
+
+            $data['category_tags'] = $category_tags->get()->toArray();
+
+            $data['verifiers'] = User::where('id_cms_privileges',UserPrivilege::withName("Verifier")->id)
+                ->orderBy('name','asc')
                 ->get();
 
             $data['categories'] = WarehouseCategory::where('status','ACTIVE')
+                ->whereIn('id',array_column($data['category_tags'],'warehouse_categories_id'))
                 ->orderBy('warehouse_category_description','asc')
                 ->get();
 
@@ -438,7 +493,9 @@ use App\Models\CountType;
                     'count_types_id' => $request->count_type,
                     'category_tag_number' => $request->category_tag,
                     'warehouse_categories_id' => $request->warehouse_category,
-                    'total_qty' => $request->total_quantity
+                    'total_qty' => $request->total_quantity,
+                    'updated_by' => $request->verified_by,
+                    'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
             foreach ($request->item_code as $key => $value) {
