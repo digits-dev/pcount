@@ -52,7 +52,7 @@ use App\Models\UserCategoryTag;
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			$this->form[] = ['label'=>'User Name','name'=>'user_name','type'=>'select','validation'=>'required','width'=>'col-sm-5',
-                'dataquery' => "select user_name AS value, user_name AS label from cms_users where status='ACTIVE' and id_cms_privileges!='1'"];
+                'dataquery' => "select user_name AS value, user_name AS label from cms_users where status='ACTIVE' and id_cms_privileges!='1' order by label asc"];
 			$this->form[] = ['label'=>'Category Tag Number','name'=>'category_tag_number','type'=>'text','validation'=>'required|min:1|max:50','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Warehouse Category','name'=>'warehouse_categories_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5',
                 'datatable'=>'warehouse_categories,warehouse_category_description'];
