@@ -99,8 +99,9 @@ class CountTempLineController extends Controller
 
     public function updateItemQty(Request $request)
     {
-        return json_encode(CountTempLine::where('id',$request->line_id)
-            ->increment('qty'));
+        return json_encode(CountTempLine::where('id',$request->line_id)->update([
+            'qty' => $request->line_qty
+        ]));//->increment('qty'));
     }
 
     public function updateItemRevisedQty(Request $request)
