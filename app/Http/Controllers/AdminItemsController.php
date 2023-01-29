@@ -348,7 +348,7 @@
                     'items.upc_code5',
                     'items.item_description',
                     'warehouse_categories.warehouse_category_description',
-                    'warehouse_categories.id as wh_category_id')
+                    'items.warehouse_categories_id as wh_category_id')
                 ->get());
         }
 

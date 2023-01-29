@@ -2,8 +2,9 @@
 @section('content')
 
 @push('head')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.css" integrity="sha256-F2TGXW+mc8e56tXYBFYeucG/SgD6qQt4SNFxmpVXdUk=" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
     .swal2-popup {
         font-size: 1.5rem !important;
@@ -37,8 +38,9 @@
                 <b>Category</b>
                 <div class='form-group'>
 
-                    <select name="warehouse_category" id="category" class="form-control category" required title="Category">
-                        <option value="">Please select category</option>
+                    <select name="warehouse_category" id="category" class="form-control category" style="width: 100%;" required title="Category">
+                        {{-- <option value="">Please select category</option> --}}
+                        <option></option>
                         @foreach ($categories as $category)
                             @if($headers != null)
                                 <option {{ $headers->warehouse_categories_id == $category->id ? "selected" : "disabled" }} value="{{ $category->id }}">{{ $category->warehouse_category_description }}</option>
@@ -54,8 +56,9 @@
                 <b>Count Tag</b>
                 <div class='form-group'>
 
-                    <select name="category_tag" id="category_tag" class="form-control category_tag" required title="Count Tag" disabled>
-                        <option value="">Please select count tag</option>
+                    <select name="category_tag" id="category_tag" class="form-control category_tag" style="width: 100%;" required title="Count Tag" disabled>
+                        {{-- <option value="">Please select count tag</option> --}}
+                        <option></option>
                         @if ($headers != null)
                             <option selected value="{{ $headers->category_tag_number }}">{{ $headers->category_tag_number }}</option>
                         @endif
@@ -66,7 +69,8 @@
             <div class="col-md-3">
                 <b>Verifier</b>
                 <div class='form-group'>
-                    <select name="verified_by" id="verifier" class="form-control verifier" style="width: 100%" required title="Verifier" disabled>
+                    <select name="verified_by" id="verifier" class="form-control verifier" style="width: 100%;" required title="Verifier" disabled>
+                        <option></option>
                         @foreach ($verifiers as $verifier)
                             <option value="{{ $verifier->id }}">{{ $verifier->name }}</option>
                         @endforeach
@@ -219,9 +223,10 @@
         integrity="sha512-37T7leoNS06R80c8Ulq7cdCDU5MNQBwlYoy1TX/WUsLFC2eYNqtKlV0QjH7r8JpG/S0GUMZwebnVFLPd6SU5yg=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script src='https://cdn.rawgit.com/admsev/jquery-play-sound/master/jquery.playSound.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.js" integrity="sha256-CT21YfDe01wscF4AKCPn7mDQEHR2OC49jQZkt5wtl0g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         var countItems = {};
         var countItemsUpc = {};
@@ -230,9 +235,19 @@
         var countCategory = [];
 
         $(document).ready( function () {
-            $("#verifier").select2({
-                placeholder: 'Please select verifier',
+
+            $("#category").select2({
+                placeholder: "Please select category"
             });
+
+            $("#category_tag").select2({
+                placeholder: "Please select count tag"
+            });
+
+            $("#verifier").select2({
+                placeholder: "Please select verifier"
+            });
+
             $(function(){
                 $('body').addClass("sidebar-collapse");
 
@@ -248,6 +263,8 @@
 
                     countItems[item_code] = 1;
                 });
+
+
             });
 
             var sel_category = '';

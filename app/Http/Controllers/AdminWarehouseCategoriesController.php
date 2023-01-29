@@ -277,7 +277,7 @@ use Session;
 	    */
 	    public function hook_before_add(&$postdata) {
 	        //Your code here
-
+            $postdata['warehouse_category_group'] = implode(",",$postdata['warehouse_category_group']);
 	    }
 
 	    /*
