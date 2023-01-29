@@ -17,7 +17,9 @@ class UserCategoryTag extends Model
         'category_tag_number',
         'warehouse_categories_id',
         'is_used',
-        'status'
+        'status',
+        'created_by',
+        'updated_by'
     ];
 
     public static function boot()

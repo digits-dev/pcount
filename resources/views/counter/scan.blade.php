@@ -43,7 +43,7 @@
                             @if($headers != null)
                                 <option {{ $headers->warehouse_categories_id == $category->id ? "selected" : "disabled" }} value="{{ $category->id }}">{{ $category->warehouse_category_description }}</option>
                             @else
-                                <option value="{{ $category->id }}">{{ $category->warehouse_category_description }}</option>
+                                <option value="{{ $category->id }}" data-id="{{ $category->warehouse_category_group }}">{{ $category->warehouse_category_description }}</option>
                             @endif
                         @endforeach
                     </select>
@@ -67,7 +67,6 @@
                 <b>Verifier</b>
                 <div class='form-group'>
                     <select name="verified_by" id="verifier" class="form-control verifier" style="width: 100%" required title="Verifier" disabled>
-                        <option value="">Please select verifier</option>
                         @foreach ($verifiers as $verifier)
                             <option value="{{ $verifier->id }}">{{ $verifier->name }}</option>
                         @endforeach
@@ -228,9 +227,12 @@
         var countItemsUpc = {};
         var digits_code = '';
         var edited_item = '';
+        var countCategory = [];
 
         $(document).ready( function () {
-
+            $("#verifier").select2({
+                placeholder: 'Please select verifier',
+            });
             $(function(){
                 $('body').addClass("sidebar-collapse");
 
@@ -252,6 +254,8 @@
 
             $("#category").change(function(){
                 sel_category = $(this).val();
+                sel_category_group = $("#category option:selected").attr('data-id');
+                countCategory = sel_category_group.split(',');
 
                 $.ajax({
                     url:"{{ route('count.get-category-tags') }}",
@@ -307,12 +311,19 @@
                                 success:function(data) {
                                     $("#header_id").val(data);
                                     $("#verifier").removeAttr('disabled');
+                                },
+                                error:function(xhr, status, error) {
+                                    if(status == 'error'){
+                                        showStopScanAlert();
+                                    }
                                 }
                             });
                         }
                     },
-                    error:function($err){
-                        console.error();
+                    error:function(xhr, status, error) {
+                        if(status == 'error'){
+                            showStopScanAlert();
+                        }
                     }
 
                 });
@@ -393,9 +404,15 @@
                             data: {
                                 _token: "{{ csrf_token() }}",
                                 line_id: $("#item_line_id"+digits_code).val(),
+                                line_qty: $("#qty_"+digits_code).val(),
                             },
                             success:function(data) {
                                 console.log(data);
+                            },
+                            error:function(xhr, status, error) {
+                                if(status == 'error'){
+                                    showStopScanAlert();
+                                }
                             }
                         });
 
@@ -432,8 +449,8 @@
                                     });
                                     return false;
                                 }
-
-                                if(items[0].warehouse_category_description != $("#category option:selected").text()){
+                                //change
+                                if(!countCategory.includes(items[0].wh_category_id.toString())){
                                     $.playSound(ASSET_URL+'sounds/error.ogg');
                                     Swal.fire({
                                         title: "Do you want to scan this item?",
@@ -458,8 +475,10 @@
                                 }
 
                             },
-                            error:function(error){
-                                console.log(error);
+                            error:function(xhr, status, error) {
+                                if(status == 'error'){
+                                    showStopScanAlert();
+                                }
                             }
                         });
 
@@ -476,10 +495,10 @@
 
                 let rowCount = parseInt($('#scan-items tr.nr').length);
 
-                if(rowCount == 0){
-                    Swal.fire('Warning!','Please scan at least 1 item!','warning');
-                    return false;
-                }
+                // if(rowCount == 0){
+                //     Swal.fire('Warning!','Please scan at least 1 item!','warning');
+                //     return false;
+                // }
 
                 if($("#count-scan").valid()){
 
@@ -770,12 +789,21 @@
             },
             success:function(data) {
                 $("#item_line_id"+items[0].digits_code).val(data);
+            },
+            error:function(xhr, status, error) {
+                if(status == 'error'){
+                    showStopScanAlert();
+                }
             }
         });
     }
 
     function clearInputs(){
         resetItemSearch();
+    }
+
+    function showStopScanAlert(){
+        Swal.fire('Warning!','Internet connection error occured!<br> Please check your connection!','error');
     }
 
     </script>
