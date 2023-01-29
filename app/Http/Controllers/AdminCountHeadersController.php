@@ -48,6 +48,7 @@ use App\Models\WarehouseCategory;
 			$this->col[] = ["label"=>"Total Qty","name"=>"total_qty"];
 			$this->col[] = ["label"=>"Scanned By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Verified By","name"=>"updated_by","join"=>"cms_users,name"];
+            $this->col[] = ["label"=>"Is Printed","name"=>"print_flag","callback_php" => '($row->print_flag == 1? "YES" : "NO")'];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -87,7 +88,7 @@ use App\Models\WarehouseCategory;
 	        |
 	        */
 	        $this->addaction = array();
-            $this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('print').'/[id]','icon'=>'fa fa-print','color'=>'info'];
+            $this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('print').'/[id]','icon'=>'fa fa-print','color'=>'info','showIf'=>'[print_flag]==0'];
 
 	        /*
 	        | ----------------------------------------------------------------------
@@ -125,7 +126,9 @@ use App\Models\WarehouseCategory;
 	        */
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-                $this->index_button[] = ['label'=>'Scan Items','url'=> route('count.scan'),'icon'=>'fa fa-search','color'=>'info'];
+                if(CRUDBooster::isSuperAdmin() || in_array(CRUDBooster::myPrivilegeName(),["Scanner"])){
+                    $this->index_button[] = ['label'=>'Scan Items','url'=> route('count.scan'),'icon'=>'fa fa-search','color'=>'info'];
+                }
                 $this->index_button[] = ['label'=>'Export Count','url'=>"javascript:showCountExport()",'icon'=>'fa fa-download'];
             }
 
@@ -436,6 +439,7 @@ use App\Models\WarehouseCategory;
             ->get();
 
             $data['sku_count'] = CountLine::where('count_lines.count_headers_id',$id)->count();
+            CountHeader::where('count_headers.id',$id)->update(['print_flag'=>1]);
             return view('counter.print',$data);
         }
 
@@ -451,10 +455,18 @@ use App\Models\WarehouseCategory;
 
             $data['count_type'] = CountType::where('status','ACTIVE')->first();
 
-            $category_tags = UserCategoryTag::where('status','ACTIVE')->where('is_used',0);
+            $data['headers'] = CountTempHeader::where('created_by',CRUDBooster::myId())
+                ->whereNull('deleted_at')
+                ->orderBy('id','desc')
+                ->first();
+
+            $category_tags = UserCategoryTag::where('status','ACTIVE');
 
             if(CRUDBooster::myPrivilegeName() == "Scanner"){
                 $category_tags->where('user_name',$userName->user_name);
+            }
+            if(empty($data['headers'])){
+                $category_tags->where('is_used',0);
             }
 
             $data['category_tags'] = $category_tags->get()->toArray();
@@ -467,11 +479,6 @@ use App\Models\WarehouseCategory;
                 ->whereIn('id',array_column($data['category_tags'],'warehouse_categories_id'))
                 ->orderBy('warehouse_category_description','asc')
                 ->get();
-
-            $data['headers'] = CountTempHeader::where('created_by',CRUDBooster::myId())
-                ->whereNull('deleted_at')
-                ->orderBy('id','desc')
-                ->first();
 
             $data['lines'] = CountTempLine::where('count_temp_lines.count_temp_headers_id', $data['headers']->id)
                 ->whereNull('count_temp_lines.deleted_at')
@@ -498,18 +505,20 @@ use App\Models\WarehouseCategory;
                     'updated_at' => date('Y-m-d H:i:s')
                 ]);
 
-            foreach ($request->item_code as $key => $value) {
-                CountLine::firstOrCreate([
-                    'count_headers_id' => $header->id,
-                    'item_code' => $value
-                ],[
-                    'count_headers_id' => $header->id,
-                    'item_code' => $value,
-                    'qty' => $request->qty[$key],
-                    'revised_qty' => $request->revised_qty[$key],
-                    'line_remarks' => $request->remarks[$key],
-                    'line_color' => $request->line_color[$key]
-                ]);
+            if($request->has('item_code')){
+                foreach ($request->item_code as $key => $value) {
+                    CountLine::firstOrCreate([
+                        'count_headers_id' => $header->id,
+                        'item_code' => $value
+                    ],[
+                        'count_headers_id' => $header->id,
+                        'item_code' => $value,
+                        'qty' => $request->qty[$key],
+                        'revised_qty' => $request->revised_qty[$key],
+                        'line_remarks' => $request->remarks[$key],
+                        'line_color' => $request->line_color[$key]
+                    ]);
+                }
             }
 
             if($request->has('new_item_code')){
