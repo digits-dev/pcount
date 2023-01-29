@@ -18,8 +18,8 @@ use Session;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = false;
-			$this->button_edit = false;
+			$this->button_add = true;
+			$this->button_edit = true;
 			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -33,6 +33,7 @@ use Session;
 			$this->col = [];
 			$this->col[] = ["label"=>"Warehouse Category Code","name"=>"warehouse_category_code"];
 			$this->col[] = ["label"=>"Warehouse Category Description","name"=>"warehouse_category_description"];
+            $this->col[] = ["label"=>"Warehouse Category Group","name"=>"warehouse_category_group"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label"=>"Is Restricted","name"=>"is_restricted","callback_php" => '($row->is_restricted == 1? "YES" : "NO")'];
             $this->col[] = ["label"=>"Created Date","name"=>"created_at"];
@@ -44,6 +45,8 @@ use Session;
 			$this->form[] = ['label'=>'Warehouse Category Code','name'=>'warehouse_category_code','type'=>'text','validation'=>'required|min:1|max:50','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Warehouse Category Description','name'=>'warehouse_category_description','type'=>'text','validation'=>'required|min:1|max:150','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Is Restricted','name'=>'is_restricted','type'=>'radio','validation'=>'required|integer','width'=>'col-sm-5','dataenum'=>'0|No;1|Yes'];
+            $this->form[] = ['label'=>'Warehouse Category Group','name'=>'warehouse_category_group','type'=>'select2-multiple','validation'=>'required|min:1|max:50','width'=>'col-sm-5',
+                'multiple'=>'multiple','datatable'=>'warehouse_categories,warehouse_category_description'];
 			if(in_array(CRUDBooster::getCurrentMethod(),['getEdit','postEditSave','getDetail'])) {
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
 			}# END FORM DO NOT REMOVE THIS LINE
@@ -299,7 +302,7 @@ use Session;
 	    */
 	    public function hook_before_edit(&$postdata,$id) {
 	        //Your code here
-
+            $postdata['warehouse_category_group'] = implode(",",$postdata['warehouse_category_group']);
 	    }
 
 	    /*
