@@ -2,6 +2,7 @@
 
 use App\Exports\ExcelTemplateExport;
 use App\Imports\UserImport;
+use App\Models\User;
 use Session;
 use Illuminate\Http\Request;
 use DB;
@@ -49,6 +50,12 @@ class AdminCmsUsersController extends CBController {
             $this->index_button[] = ['label'=>'Import Users','url'=> route('users.get-import'),'icon'=>'fa fa-upload','color'=>'info'];
         }
 
+        $this->button_selected = array();
+        if(CRUDBooster::isSuperadmin()){
+            $this->button_selected[] = ["label"=>"Set Status ACTIVE ","icon"=>"fa fa-check-circle","name"=>"set_status_ACTIVE"];
+            $this->button_selected[] = ["label"=>"Set Status INACTIVE","icon"=>"fa fa-times-circle","name"=>"set_status_INACTIVE"];
+        }
+
 	}
 
 	public function getProfile() {
@@ -71,6 +78,26 @@ class AdminCmsUsersController extends CBController {
 	public function hook_before_add(&$postdata) {
 
 	}
+    public function actionButtonSelected($id_selected,$button_name) {
+        //Your code here
+        switch ($button_name) {
+            case 'set_status_ACTIVE':
+                User::whereIn('id',$id_selected)->update([
+                    'status'=>'ACTIVE',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+                break;
+            case 'set_status_INACTIVE':
+                User::whereIn('id',$id_selected)->update([
+                    'status'=>'INACTIVE',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+                break;
+            default:
+                # code...
+                break;
+        }
+    }
 
     public function getImport()
     {

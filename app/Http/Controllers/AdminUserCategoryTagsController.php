@@ -101,6 +101,11 @@ use App\Models\UserCategoryTag;
 	        |
 	        */
 	        $this->button_selected = array();
+            if(CRUDBooster::isSuperadmin()){
+                $this->button_selected[] = ["label"=>"Reset Used Count Tags","icon"=>"fa fa-check-circle","name"=>"reset_used_count_tags"];
+                $this->button_selected[] = ["label"=>"Set Status ACTIVE","icon"=>"fa fa-check-circle","name"=>"set_status_ACTIVE"];
+                $this->button_selected[] = ["label"=>"Set Status INACTIVE","icon"=>"fa fa-times-circle","name"=>"set_status_INACTIVE"];
+            }
 
 
 	        /*
@@ -235,7 +240,29 @@ use App\Models\UserCategoryTag;
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
 	        //Your code here
-
+            switch ($button_name) {
+                case 'reset_used_count_tags':
+                    UserCategoryTag::whereIn('id',$id_selected)->update([
+                        'is_used'=> 0,
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                    break;
+                case 'set_status_ACTIVE':
+                    UserCategoryTag::whereIn('id',$id_selected)->update([
+                        'status'=>'ACTIVE',
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                    break;
+                case 'set_status_INACTIVE':
+                    UserCategoryTag::whereIn('id',$id_selected)->update([
+                        'status'=>'INACTIVE',
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ]);
+                    break;
+                default:
+                    # code...
+                    break;
+            }
 	    }
 
 
