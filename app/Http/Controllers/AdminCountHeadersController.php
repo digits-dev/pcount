@@ -472,6 +472,7 @@ use App\Models\WarehouseCategory;
             $data['category_tags'] = $category_tags->get()->toArray();
 
             $data['verifiers'] = User::where('id_cms_privileges',UserPrivilege::withName("Verifier")->id)
+                ->where('status','ACTIVE')
                 ->orderBy('name','asc')
                 ->get();
 

@@ -599,7 +599,7 @@
                 else if(data.count_passcode == $("#passcode").val()){
 
                     setTimeout(function(){
-                        if($("#revised_qty").val() == 0){
+                        if(parseInt($("#revised_qty").val()) == 0){
                             $.playSound(ASSET_URL+'sounds/error.ogg');
                             Swal.fire('Warning!','Zero (0) qty is not allowed!','error');
                             $("#passcode").val('');
@@ -607,7 +607,7 @@
                             $("#remarks").val('');
                             return false;
                         }
-                        else if($("#revised_qty").val() > $("#qty_"+edited_item).val()){
+                        else if(parseInt($("#revised_qty").val()) > parseInt($("#qty_"+edited_item).val())){
                             $.playSound(ASSET_URL+'sounds/error.ogg');
                             Swal.fire('Warning!','You can\'t input qty greater than the actual scanned qty!','error');
                             $("#passcode").val('');
@@ -615,7 +615,7 @@
                             $("#remarks").val('');
                             return false;
                         }
-                        else if($("#revised_qty").val() == $("#qty_"+edited_item).val()){
+                        else if(parseInt($("#revised_qty").val()) == parseInt($("#qty_"+edited_item).val())){
                             $.playSound(ASSET_URL+'sounds/error.ogg');
                             Swal.fire('Warning!','You can\'t input qty equal to the actual scanned qty!','error');
                             $("#passcode").val('');
