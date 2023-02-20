@@ -453,7 +453,7 @@ use App\Models\WarehouseCategory;
             $data['page_title'] = 'Scan Items';
             $userName = User::where('id',CRUDBooster::myId())->first();
 
-            $data['count_type'] = CountType::where('status','ACTIVE')->first();
+            $data['count_types'] = CountType::where('status','ACTIVE')->get();
 
             $data['headers'] = CountTempHeader::where('created_by',CRUDBooster::myId())
                 ->whereNull('deleted_at')

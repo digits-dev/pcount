@@ -14,68 +14,112 @@
         zoom: 1.5;
     } */
 
+    .has-error .select2-selection {
+        border-style: solid;
+        border-color:red !important;
+    }
+    .error{
+        color: red;
+    }
+    label .error{
+        border: 0;
+    }
+   .common_box_body {
+        padding: 15px;
+        border: 12px solid #28BAA2;
+        border-color: #28BAA2;
+        border-radius: 15px;
+        margin-top: 10px;
+        background: #d4edda;
+    }
+
 </style>
+
 @endpush
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        <h4 class="box-title text-center"><b>{{ $count_type->count_type_code }} : <span id="totalScanQty" style="color:red;">0 Qty</span></b></h4>
+        <h4 class="box-title text-center"><b><span id="countActivity"></span> : <span id="totalScanQty" style="color:red;">0 Qty</span></b></h4>
     </div>
     <div class='panel-body'>
         <form method='post' action="{{ route('count.save-scan') }}" id="count-scan" autocomplete="off" role="form" enctype="multipart/form-data">
             <input type='hidden' name='_token' value="{{ csrf_token() }}">
-            <input type="hidden" name="count_type" id="count_type" value="{{ $count_type->id }}">
+            <input type="hidden" name="count_type" id="count_type">
             <input type="hidden" id="header_id" name="temp_headers_id" value="{{ ($headers != null) ? $headers->id : '' }}">
 
-            <div class="col-md-3">
-                <b>Scan Item Code</b>
-                <div class='form-group'>
-                    <input type="text" class="form-control" id="item_search" disabled="disabled">
+            <div class="row">
+                <div class="col-md-3">
+                    <b>Count Activity</b>
+                    <div class='form-group has-validation'>
+
+                        <select name="count_activity" id="count_activity" class="form-control count_activity" style="width: 100%;" required title="Count Activity">
+                            <option></option>
+                            @foreach ($count_types as $count_activity)
+                                <option value="{{ $count_activity->id  }}" data-count-code="{{ $count_activity->count_type_description }}">{{ $count_activity->count_type_description }}</option>
+                            @endforeach
+                        </select>
+                        <label for="count_activity" generated="true" class="error"></label>
+                    </div>
+
                 </div>
-            </div>
 
-            <div class="col-md-3">
-                <b>Category</b>
-                <div class='form-group'>
+                <div class="col-md-3">
+                    <b>Category</b>
+                    <div class='form-group'>
 
-                    <select name="warehouse_category" id="category" class="form-control category" style="width: 100%;" required title="Category">
-                        {{-- <option value="">Please select category</option> --}}
-                        <option></option>
-                        @foreach ($categories as $category)
-                            @if($headers != null)
-                                <option {{ $headers->warehouse_categories_id == $category->id ? "selected" : "disabled" }} value="{{ $category->id }}">{{ $category->warehouse_category_description }}</option>
-                            @else
-                                <option value="{{ $category->id }}" data-id="{{ $category->warehouse_category_group }}">{{ $category->warehouse_category_description }}</option>
+                        <select name="warehouse_category" id="category" class="form-control category" style="width: 100%;" required title="Category" disabled>
+                            <option></option>
+                            @foreach ($categories as $category)
+                                @if($headers != null)
+                                    <option {{ $headers->warehouse_categories_id == $category->id ? "selected" : "disabled" }} value="{{ $category->id }}">{{ $category->warehouse_category_description }}</option>
+                                @else
+                                    <option value="{{ $category->id }}" data-id="{{ $category->warehouse_category_group }}">{{ $category->warehouse_category_description }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <label for="category" generated="true" class="error"></label>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <b>Count Tag</b>
+                    <div class='form-group'>
+
+                        <select name="category_tag" id="category_tag" class="form-control category_tag" style="width: 100%;" required title="Count Tag" disabled>
+                            <option></option>
+                            @if ($headers != null)
+                                <option selected value="{{ $headers->category_tag_number }}">{{ $headers->category_tag_number }}</option>
                             @endif
-                        @endforeach
-                    </select>
+                        </select>
+                        <label for="category_tag" generated="true" class="error"></label>
+                    </div>
                 </div>
+
+                <div class="col-md-3">
+                    <b>Verifier</b>
+                    <div class='form-group has-validation'>
+                        <select name="verified_by" id="verifier" class="form-control verifier" style="width: 100%;" required title="Verifier" disabled tabindex="-1">
+                            <option></option>
+                            @foreach ($verifiers as $verifier)
+                                <option value="{{ $verifier->id }}">{{ $verifier->name }}</option>
+                            @endforeach
+                        </select>
+                        <label for="verifier" generated="true" class="error"></label>
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="col-md-3">
-                <b>Count Tag</b>
-                <div class='form-group'>
+            <div class="row">
 
-                    <select name="category_tag" id="category_tag" class="form-control category_tag" style="width: 100%;" required title="Count Tag" disabled>
-                        {{-- <option value="">Please select count tag</option> --}}
-                        <option></option>
-                        @if ($headers != null)
-                            <option selected value="{{ $headers->category_tag_number }}">{{ $headers->category_tag_number }}</option>
-                        @endif
-                    </select>
+                <div class="col-md-3">
+                    <b>Scan Item Code</b>
+                    <div class='form-group'>
+                        <input type="text" class="form-control" id="item_search" disabled="disabled">
+                    </div>
                 </div>
-            </div>
 
-            <div class="col-md-3">
-                <b>Verifier</b>
-                <div class='form-group'>
-                    <select name="verified_by" id="verifier" class="form-control verifier" style="width: 100%;" required title="Verifier" disabled>
-                        <option></option>
-                        @foreach ($verifiers as $verifier)
-                            <option value="{{ $verifier->id }}">{{ $verifier->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
             </div>
 
             <div class="col-md-12 col-sm-12">
@@ -236,6 +280,10 @@
 
         $(document).ready( function () {
 
+            $("#count_activity").select2({
+                placeholder: "Please select activity"
+            });
+
             $("#category").select2({
                 placeholder: "Please select category"
             });
@@ -268,6 +316,15 @@
             });
 
             var sel_category = '';
+
+            $("#count_activity").change(function () {
+                let sel_activity = $(this).val();
+                $("#count_type").val(sel_activity);
+                $("#countActivity").text($(this).text());
+
+                $(".count_activity option:not(:selected)").prop('disabled', true);
+                $("#category").removeAttr('disabled');
+            });
 
             $("#category").change(function(){
                 sel_category = $(this).val();
@@ -517,6 +574,21 @@
                 //     return false;
                 // }
 
+                $("#count-scan").validate({
+                    rules: {
+                        count_activity: "required",
+                        category: "required",
+                        count_tag: "required",
+                        verified_by: "required",
+                    },
+                    messages: {
+                        count_activity: "*Please indicate your count activity",
+                        category: "*Please indicate category",
+                        count_tag: "*Please indicate count tag",
+                        verified_by: "*Please indicate your verifier",
+                    }
+                });
+
                 if($("#count-scan").valid()){
 
                     Swal.fire({
@@ -574,13 +646,15 @@
 
     function checkEditPassCode(){
 
+        let countTypeCode = $("#count_activity option:selected").attr("data-count-code");
+
         $.ajax({
             url:"{{ route('count.get-passcode') }}",
             type:"POST",
             dataType: "json",
             data: {
                 _token: "{{ csrf_token() }}",
-                count_type: "{{ $count_type->count_type_code }}",
+                count_type: countTypeCode,
                 count_passcode: $("#passcode").val(),
             },
             success:function(data) {
@@ -660,13 +734,15 @@
 
     function checkNewItemPassCode(){
 
+        let countTypeCode = $("#count_activity option:selected").attr("data-count-code");
+
         $.ajax({
             url:"{{ route('count.get-passcode') }}",
             type:"POST",
             dataType: "json",
             data: {
                 _token: "{{ csrf_token() }}",
-                count_type: "{{ $count_type->count_type_code }}",
+                count_type: countTypeCode,
                 count_passcode: $("#new_item_passcode").val(),
             },
             success:function(data) {
