@@ -371,7 +371,6 @@
                         category_tag: sel_category_tag,
                     },
                     success:function(data) {
-                        console.log('category tag:'+data);
                         if(data){
 
                             $(".category_tag option:not(:selected)").prop('disabled', true);
@@ -391,7 +390,6 @@
                                     $("#verifier").removeAttr('disabled');
                                 },
                                 error:function(xhr, status, error) {
-                                    console.log(status);
                                     if(status == 'error'){
                                         showStopScanAlert();
                                     }
@@ -400,7 +398,6 @@
                         }
                     },
                     error:function(xhr, status, error) {
-                        console.log(status);
                         if(status == 'error'){
                             showStopScanAlert();
                         }
