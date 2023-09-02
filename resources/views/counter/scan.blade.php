@@ -272,6 +272,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.js" integrity="sha256-CT21YfDe01wscF4AKCPn7mDQEHR2OC49jQZkt5wtl0g=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+
+    <noscript>
+        Swal.fire({
+                    title: "Javascript not enabled?",
+                    text: "Please enable your javascript in your browser settings?",
+                    icon: "warning"
+                });
+    </noscript>
+
         var countItems = {};
         var countItemsUpc = {};
         var digits_code = '';
