@@ -43,7 +43,7 @@
     </div>
     <div class='panel-body'>
         <form method='post' action="{{ route('count.save-scan') }}" id="count-scan" autocomplete="off" role="form" enctype="multipart/form-data">
-            <input type='hidden' name='_token' value="{{ csrf_token() }}">
+            <input type='hidden' name='_token' id="token" value="{{ csrf_token() }}">
             <input type="hidden" name="count_type" id="count_type">
             <input type="hidden" id="header_id" name="temp_headers_id" value="{{ ($headers != null) ? $headers->id : '' }}">
 
@@ -277,6 +277,7 @@
         var digits_code = '';
         var edited_item = '';
         var countCategory = [];
+        var token = $("#token").val();
 
         $(document).ready( function () {
 
@@ -365,7 +366,7 @@
                     type:"POST",
                     dataType: "json",
                     data: {
-                        _token: "{{ csrf_token() }}",
+                        _token: token,
                         category: sel_category,
                         category_tag: sel_category_tag,
                     },
@@ -379,7 +380,7 @@
                                 type:"POST",
                                 dataType: "json",
                                 data: {
-                                    _token: "{{ csrf_token() }}",
+                                    _token: token,
                                     count_type: $("#count_type").val(),
                                     category: sel_category,
                                     category_tag: sel_category_tag,
@@ -503,7 +504,7 @@
                             type:"POST",
                             dataType: "json",
                             data: {
-                                _token: "{{ csrf_token() }}",
+                                _token: token,
                                 item_code: $('#item_search').val().trim(),
                             },
                             success:function(items) {
@@ -657,7 +658,7 @@
             type:"POST",
             dataType: "json",
             data: {
-                _token: "{{ csrf_token() }}",
+                _token: token,
                 count_type: countTypeCode,
                 count_passcode: $("#passcode").val(),
             },
@@ -712,7 +713,7 @@
                                 type:"POST",
                                 dataType: "json",
                                 data: {
-                                    _token: "{{ csrf_token() }}",
+                                    _token: token,
                                     line_id: $("#item_line_id"+edited_item).val(),
                                     revised_qty: $("#revised_qty").val(),
                                     remarks: $("#remarks").val(),
@@ -745,7 +746,7 @@
             type:"POST",
             dataType: "json",
             data: {
-                _token: "{{ csrf_token() }}",
+                _token: token,
                 count_type: countTypeCode,
                 count_passcode: $("#new_item_passcode").val(),
             },
@@ -810,7 +811,7 @@
                         type:"POST",
                         dataType: "json",
                         data: {
-                            _token: "{{ csrf_token() }}",
+                            _token: token,
                             count_header: $("#header_id").val(),
                             item_code: new_item_code,
                             line_color: "#0000FF",
@@ -878,7 +879,7 @@
             type:"POST",
             dataType: "json",
             data: {
-                _token: "{{ csrf_token() }}",
+                _token: token,
                 count_header: $("#header_id").val(),
                 item_code: items[0].digits_code,
                 line_color: color,
