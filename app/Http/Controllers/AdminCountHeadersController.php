@@ -31,7 +31,7 @@ use App\Models\WarehouseCategory;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
 			$this->button_edit = false;
-			$this->button_delete = false;
+			$this->button_delete = (CRUDBooster::isSuperAdmin()) ? true : false;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -101,7 +101,9 @@ use App\Models\WarehouseCategory;
 	        |
 	        */
 	        $this->button_selected = array();
-
+            if(CRUDBooster::isUpdate() && CRUDBooster::isSuperadmin()){
+				$this->button_selected[] = ['label'=>'Reset Count','icon'=>'fa fa-refresh','name'=>'Reset_Count'];
+			}
 
 	        /*
 	        | ----------------------------------------------------------------------
@@ -268,7 +270,10 @@ use App\Models\WarehouseCategory;
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
 	        //Your code here
-
+            if($button_name == 'Reset_Count'){
+                CountHeader::whereIn('id',$id_selected)->delete();
+                CountLine::whereIn('count_headers_id',$id_selected)->delete();
+            }
 	    }
 
 
@@ -494,8 +499,10 @@ use App\Models\WarehouseCategory;
 
         public function saveScan(Request $request)
         {
+
             $header = CountHeader::firstOrCreate([
-                    'category_tag_number' => $request->category_tag
+                    'category_tag_number' => $request->category_tag,
+					'count_types_id' => $request->count_type,
                 ],
                 [
                     'count_types_id' => $request->count_type,

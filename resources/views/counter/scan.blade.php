@@ -316,9 +316,10 @@
             });
 
             var sel_category = '';
+            var sel_activity = '';
 
             $("#count_activity").change(function () {
-                let sel_activity = $(this).val();
+                sel_activity = $(this).val();
                 $("#count_type").val(sel_activity);
                 $("#countActivity").text($(this).text());
 
@@ -338,6 +339,7 @@
                     data: {
                         _token: "{{ csrf_token() }}",
                         category: sel_category,
+                        activity: sel_activity,
                     },
                     success:function(data) {
 
