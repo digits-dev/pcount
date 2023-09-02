@@ -389,6 +389,7 @@
                                     $("#verifier").removeAttr('disabled');
                                 },
                                 error:function(xhr, status, error) {
+                                    console.log(status);
                                     if(status == 'error'){
                                         showStopScanAlert();
                                     }
@@ -397,6 +398,7 @@
                         }
                     },
                     error:function(xhr, status, error) {
+                        console.log(status);
                         if(status == 'error'){
                             showStopScanAlert();
                         }
