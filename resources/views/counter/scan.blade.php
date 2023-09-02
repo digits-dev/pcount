@@ -372,7 +372,7 @@
                     },
                     success:function(data) {
                         console.log('category tag:'+data);
-                        if(data == 1){
+                        if(data){
 
                             $(".category_tag option:not(:selected)").prop('disabled', true);
                             //save headers
