@@ -371,6 +371,7 @@
                         category_tag: sel_category_tag,
                     },
                     success:function(data) {
+                        console.log('category tag:'+data);
                         if(data == 1){
 
                             $(".category_tag option:not(:selected)").prop('disabled', true);
