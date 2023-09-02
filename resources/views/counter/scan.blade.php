@@ -338,7 +338,7 @@
                     type:"POST",
                     dataType: "json",
                     data: {
-                        _token: "{{ csrf_token() }}",
+                        _token: token,
                         category: sel_category,
                         activity: sel_activity,
                     },
@@ -481,7 +481,7 @@
                             type:"POST",
                             dataType: "json",
                             data: {
-                                _token: "{{ csrf_token() }}",
+                                _token: token,
                                 line_id: $("#item_line_id"+digits_code).val(),
                                 line_qty: $("#qty_"+digits_code).val(),
                             },
