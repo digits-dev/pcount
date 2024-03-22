@@ -55,7 +55,7 @@
                         <select name="count_activity" id="count_activity" class="form-control count_activity" style="width: 100%;" required title="Count Activity">
                             <option></option>
                             @foreach ($count_types as $count_activity)
-                                <option value="{{ $count_activity->id  }}" data-count-code="{{ $count_activity->count_type_description }}">{{ $count_activity->count_type_description }}</option>
+                                <option value="{{ $count_activity->id  }}" data-count-code="{{ $count_activity->count_type_code }}">{{ $count_activity->count_type_description }}</option>
                             @endforeach
                         </select>
                         <label for="count_activity" generated="true" class="error"></label>
