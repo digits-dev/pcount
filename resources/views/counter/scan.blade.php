@@ -145,7 +145,7 @@
                                     @foreach ($lines as $item)
                                         <tr class="nr" id="rowid{{$item->item_code}}" data-tr="row" style="color:{{ $item->line_color }}">
                                             <td class="text-center">{{$item->item_code}}
-                                                <input type="hidden" id="item_code{{$item->item_code}}" data-id="{{$item->item_code}}" class="item-codes" name="item_code[]" value="{{$item->item_code}}">
+                                                <input type="hidden" id="item_code{{$item->item_code}}" data-id="{{$item->item_code}}" data-upc="{{ $item->upc_code }}" class="item-codes" name="item_code[]" value="{{$item->item_code}}">
                                             </td>
                                             <td>{{$item->item_description}}
                                                 <input type="hidden" id="item_line_id{{$item->item_code}}" name="item_line_id[]" value="{{$item->id}}">
@@ -309,8 +309,10 @@
 
                 $('.item-codes').each(function () {
                     let item_code = $(this).attr('data-id');
+                    let item_upc = $(this).attr('data-upc');
 
                     countItems[item_code] = 1;
+                    countItemsUpc[item_upc] = item_code;
                 });
 
 
@@ -472,9 +474,8 @@
                             }
                             getTotalComputations();
 
-                        },500);
-
-                        $.ajax({
+                            //update temp lines qty
+                            $.ajax({
                             url:"{{ route('count.update-temp-line') }}",
                             type:"POST",
                             dataType: "json",
@@ -492,6 +493,8 @@
                                 }
                             }
                         });
+
+                        },500);
 
                         resetItemSearch();
                     }

@@ -490,9 +490,8 @@ use App\Models\WarehouseCategory;
                 ->whereNull('count_temp_lines.deleted_at')
                 ->join('items','count_temp_lines.item_code','items.digits_code')
                 ->join('warehouse_categories','items.warehouse_categories_id','warehouse_categories.id')
-                ->select('count_temp_lines.*','items.item_description','warehouse_categories.warehouse_category_description')
+                ->select('count_temp_lines.*','items.item_description','items.upc_code','warehouse_categories.warehouse_category_description')
                 ->get();
-
 
             return view('counter.scan',$data);
         }
