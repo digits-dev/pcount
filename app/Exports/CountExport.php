@@ -80,7 +80,7 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
                 'count_lines.line_remarks',
                 'items.item_description',
                 'item_category.warehouse_category_description as item_category'
-            )->whereNull('count_headers.deleted_at');
+            )->whereNull('count_headers.deleted_at')->whereNull('count_lines.deleted_at');
 
         if(in_array(CRUDBooster::myPrivilegeName(), ["Scanner","Counter"])){
             $counts->where('count_headers.created_by',CRUDBooster::myId());
