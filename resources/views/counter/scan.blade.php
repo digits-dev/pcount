@@ -33,6 +33,16 @@
         background: #d4edda;
     }
 
+    .select2-selection__rendered {
+        line-height: 31px !important;
+    }
+    .select2-container .select2-selection--single {
+        height: 35px !important;
+    }
+    .select2-selection__arrow {
+        height: 34px !important;
+    }
+
 </style>
 
 @endpush
@@ -272,12 +282,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.24/dist/sweetalert2.min.js" integrity="sha256-CT21YfDe01wscF4AKCPn7mDQEHR2OC49jQZkt5wtl0g=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        var countItems = {};
-        var countItemsUpc = {};
-        var digits_code = '';
-        var edited_item = '';
-        var countCategory = [];
-        var token = $("#token").val();
+        let countItems = {};
+        let countItemsUpc = {};
+        let digits_code = '';
+        let edited_item = '';
+        let countCategory = [];
+        let token = $("#token").val();
 
         $(document).ready( function () {
 
@@ -306,7 +316,7 @@
                     $("#verifier").removeAttr('disabled');
                     getTotalComputations();
                 }
-
+                //read previous items & add to local storage
                 $('.item-codes').each(function () {
                     let item_code = $(this).attr('data-id');
                     let item_upc = $(this).attr('data-upc');
@@ -318,8 +328,8 @@
 
             });
 
-            var sel_category = '';
-            var sel_activity = '';
+            let sel_category = '';
+            let sel_activity = '';
 
             $("#count_activity").change(function () {
                 sel_activity = $(this).val();
@@ -615,24 +625,24 @@
         });
 
     function calculateTotalQty() {
-    var totalQty = 0;
+        let totalQty = 0;
 
-    $('.count_qty').each(function () {
-        let item_id = $(this).attr('data-id');
+        $('.count_qty').each(function () {
+            let item_id = $(this).attr('data-id');
 
-        if(isNaN(parseInt($('#revised_qty_'+item_id).val()))){
+            if(isNaN(parseInt($('#revised_qty_'+item_id).val()))){
 
-        }
-        if(parseInt($('#revised_qty_'+item_id).val()) > 0){
-            totalQty += parseInt($('#revised_qty_'+item_id).val());
-        }
-        else{
-            totalQty += parseInt($(this).val());
-        }
+            }
+            if(parseInt($('#revised_qty_'+item_id).val()) > 0){
+                totalQty += parseInt($('#revised_qty_'+item_id).val());
+            }
+            else{
+                totalQty += parseInt($(this).val());
+            }
 
-    });
+        });
 
-    return totalQty;
+        return totalQty;
     }
 
     function getTotalComputations() {
