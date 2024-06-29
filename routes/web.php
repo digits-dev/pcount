@@ -52,6 +52,7 @@ Route::group(['middleware' => ['web'], 'prefix' => config('crudbooster.ADMIN_PAT
     Route::post('set-used-category-tags', [AdminUserCategoryTagsController::class, 'setUsedCategoryTag'])->name('count.set-used-category-tags');
     Route::post('get-item', [AdminItemsController::class, 'getItem'])->name('count.get-item');
     Route::get('get-new-item', [AdminItemsController::class, 'getNewItem'])->name('items.pull-new-item');
+    Route::get('update-item', [AdminItemsController::class, 'getUpdateItem'])->name('items.pull-update-item');
     Route::post('get-passcode', [AdminCountTypesController::class, 'getPassCode'])->name('count.get-passcode');
 
     Route::post('save-temp-header', [CountTempHeaderController::class, 'saveCountHeaders'])->name('count.save-temp-header');

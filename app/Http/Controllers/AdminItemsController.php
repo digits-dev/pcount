@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
     use App\Models\Item;
+    use App\Traits\ItemTrait;
     use Session;
 	use Illuminate\Http\Request;
 	use DB;
@@ -9,6 +10,8 @@
     use Illuminate\Support\Facades\Log;
 
 	class AdminItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
+
+        use ItemTrait;
 
 	    public function cbInit() {
 
@@ -72,7 +75,8 @@
 	        |
 	        */
 	        $this->index_button = array();
-            $this->index_button[] = ["label"=>"Pull Items","url"=>route('items.pull-new-item'),"icon"=>"fa fa-download","color"=>"warning"];
+            $this->index_button[] = ["label"=>"Pull New Items","url"=>route('items.pull-new-item'),"icon"=>"fa fa-download","color"=>"warning"];
+            $this->index_button[] = ["label"=>"Update Items","url"=>route('items.pull-update-item'),"icon"=>"fa fa-refresh","color"=>"info"];
 
 	    }
 
@@ -83,23 +87,9 @@
 
         public function getNewItem(){
             //pull new items from api
-            $secretKey = config('item-api.secret_key');
-            $uniqueString = time();
-            $userAgent = $_SERVER['HTTP_USER_AGENT'];
-            if($userAgent == '' || is_null($userAgent)){
-                $userAgent = config('item-api.user_agent');
-            }
-            $xAuthorizationToken = md5( $secretKey . $uniqueString . $userAgent);
-            $xAuthorizationTime = $uniqueString;
+            $newItems = $this->getApiData(config('item-api.api_create_item_url'));
 
-            $newItems = Http::withHeaders([
-                'X-Authorization-Token' => $xAuthorizationToken,
-                'X-Authorization-Time' => $xAuthorizationTime,
-                'User-Agent' => $userAgent
-            ])->get(config('item-api.api_create_item_url'));
-
-            $data = json_decode($newItems->body(), true);
-            foreach ($data['data'] as $key => $value) {
+            foreach ($newItems['data'] as $key => $value) {
                 try {
                     Item::create($value);
                 } catch (\Exception $e) {
@@ -110,6 +100,26 @@
             Log::info("Pull new items done!");
             return redirect()->back()->with([
                 'message' => 'Pull new items done!',
+                'message_type' => 'info'
+            ]);
+        }
+
+        public function getUpdateItem(){
+            //pull updated items from api
+            $newItems = $this->getApiData(config('item-api.api_update_item_url'));
+
+            foreach ($newItems['data'] as $key => $value) {
+                try {
+                    Item::where('digits_code',$value->digits_code)
+                        ->update($value);
+                } catch (\Exception $e) {
+                    Log::error($e->getMessage());
+                }
+            }
+
+            Log::info("Update items done!");
+            return redirect()->back()->with([
+                'message' => 'Update items done!',
                 'message_type' => 'info'
             ]);
         }
