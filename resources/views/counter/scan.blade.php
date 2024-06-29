@@ -42,6 +42,12 @@
     .select2-selection__arrow {
         height: 34px !important;
     }
+    table.table-bordered>tbody>tr>td {
+        border: 1px solid #111111 !important;
+    }
+    table.table-bordered>thead>tr>th {
+        border: 1px solid #111111 !important;
+    }
 
 </style>
 
