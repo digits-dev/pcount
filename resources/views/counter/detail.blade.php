@@ -3,7 +3,14 @@
 
 @push('head')
 
-
+    <style>
+        table.table-bordered>tbody>tr>td {
+            border: 1px solid #111111 !important;
+        }
+        table.table-bordered>thead>tr>th {
+            border: 1px solid #111111 !important;
+        }
+    </style>
 @endpush
 
     @if(g('return_url'))
