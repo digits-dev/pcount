@@ -72,7 +72,7 @@
 	        |
 	        */
 	        $this->index_button = array();
-            $this->index_button[] = ["label"=>"Pull Items","url"=>route('items.pull-new-item'),"icon"=>"fa fa-import"];
+            $this->index_button[] = ["label"=>"Pull Items","url"=>route('items.pull-new-item'),"icon"=>"fa fa-download","color"=>"warning"];
 
 	    }
 
@@ -108,6 +108,10 @@
             }
 
             Log::info("Pull new items done!");
+            return redirect()->back()->with([
+                'message' => 'Pull new items done!',
+                'message_type' => 'info'
+            ]);
         }
 
 	}
