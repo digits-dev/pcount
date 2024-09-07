@@ -38,27 +38,30 @@ Route::group(['middleware' => ['web'], 'prefix' => config('crudbooster.ADMIN_PAT
         Route::get('get-import', [AdminUserCategoryTagsController::class, 'getImport'])->name('count-tags.get-import');
         Route::get('get-template', [AdminUserCategoryTagsController::class, 'getTemplate'])->name('count-tags.get-template');
         Route::post('import', [AdminUserCategoryTagsController::class, 'importCountTags'])->name('count-tags.import');
-
+        Route::post('get-category-tags', [AdminUserCategoryTagsController::class, 'getCategoryTagByCategory'])->name('count.get-category-tags');
+        Route::post('set-used-category-tags', [AdminUserCategoryTagsController::class, 'setUsedCategoryTag'])->name('count.set-used-category-tags');
     });
 
-    //user
     Route::group(['prefix' => 'users'], function () {
         Route::get('get-import', [AdminCmsUsersController::class, 'getImport'])->name('users.get-import');
         Route::get('get-template', [AdminCmsUsersController::class, 'getTemplate'])->name('users.get-template');
         Route::post('import', [AdminCmsUsersController::class, 'importUsers'])->name('users.import');
     });
 
-    Route::post('get-category-tags', [AdminUserCategoryTagsController::class, 'getCategoryTagByCategory'])->name('count.get-category-tags');
-    Route::post('set-used-category-tags', [AdminUserCategoryTagsController::class, 'setUsedCategoryTag'])->name('count.set-used-category-tags');
-    Route::post('get-item', [AdminItemsController::class, 'getItem'])->name('count.get-item');
-    Route::get('get-new-item', [AdminItemsController::class, 'getNewItem'])->name('items.pull-new-item');
-    Route::get('update-item', [AdminItemsController::class, 'getUpdateItem'])->name('items.pull-update-item');
-    Route::post('get-passcode', [AdminCountTypesController::class, 'getPassCode'])->name('count.get-passcode');
+    Route::group(['prefix' => 'items'], function () {
+        Route::post('get-item', [AdminItemsController::class, 'getItem'])->name('count.get-item');
+        Route::get('get-new-item', [AdminItemsController::class, 'getNewItem'])->name('items.pull-new-item');
+        Route::get('update-item', [AdminItemsController::class, 'getUpdateItem'])->name('items.pull-update-item');
+    });
 
-    Route::post('save-temp-header', [CountTempHeaderController::class, 'saveCountHeaders'])->name('count.save-temp-header');
-    Route::post('get-temp-header', [CountTempHeaderController::class, 'getCountHeaders'])->name('count.get-temp-header');
-    Route::post('save-temp-lines', [CountTempLineController::class, 'saveCountLines'])->name('count.save-temp-line');
-    Route::post('update-temp-lines', [CountTempLineController::class, 'updateItemQty'])->name('count.update-temp-line');
-    Route::post('update-temp-revised-lines', [CountTempLineController::class, 'updateItemRevisedQty'])->name('count.update-temp-line-revised');
+    Route::group(['prefix' => 'temps'], function () {
+        Route::post('save-temp-header', [CountTempHeaderController::class, 'saveCountHeaders'])->name('count.save-temp-header');
+        Route::post('get-temp-header', [CountTempHeaderController::class, 'getCountHeaders'])->name('count.get-temp-header');
+        Route::post('save-temp-lines', [CountTempLineController::class, 'saveCountLines'])->name('count.save-temp-line');
+        Route::post('update-temp-lines', [CountTempLineController::class, 'updateItemQty'])->name('count.update-temp-line');
+        Route::post('update-temp-revised-lines', [CountTempLineController::class, 'updateItemRevisedQty'])->name('count.update-temp-line-revised');
+    });
+
+    Route::post('get-passcode', [AdminCountTypesController::class, 'getPassCode'])->name('count.get-passcode');
 
 });
