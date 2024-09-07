@@ -21,8 +21,8 @@ class AdminCmsUsersController extends CBController {
 		$this->primary_key         = 'id';
 		$this->title_field         = "name";
 		$this->button_action_style = 'button_icon';
-		$this->button_import 	   = FALSE;
-		$this->button_export 	   = FALSE;
+		$this->button_import 	   = false;
+		$this->button_export 	   = true;
 		# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 		# START COLUMNS DO NOT REMOVE THIS LINE
@@ -60,11 +60,11 @@ class AdminCmsUsersController extends CBController {
 
 	public function getProfile() {
 
-		$this->button_addmore = FALSE;
-		$this->button_cancel  = FALSE;
-		$this->button_show    = FALSE;
-		$this->button_add     = FALSE;
-		$this->button_delete  = FALSE;
+		$this->button_addmore = false;
+		$this->button_cancel  = false;
+		$this->button_show    = false;
+		$this->button_add     = false;
+		$this->button_delete  = false;
 		$this->hide_form 	  = ['id_cms_privileges','user_name'];
 
 		$data['page_title'] = cbLang("label_button_profile");
@@ -80,23 +80,20 @@ class AdminCmsUsersController extends CBController {
 	}
     public function actionButtonSelected($id_selected,$button_name) {
         //Your code here
-        $status = 'ACTIVE';
+        $details = ['updated_at' => date('Y-m-d H:i:s')];
         switch ($button_name) {
             case 'set_status_ACTIVE':
-                $status = 'ACTIVE';
+                $$details['status'] = 'ACTIVE';
                 break;
             case 'set_status_INACTIVE':
-                $status = 'INACTIVE';
+                $$details['status'] = 'INACTIVE';
                 break;
             default:
                 # code...
                 break;
         }
 
-        User::whereIn('id',$id_selected)->update([
-            'status'=>$status,
-            'updated_at' => date('Y-m-d H:i:s')
-        ]);
+        User::whereIn('id',$id_selected)->update($details);
     }
 
     public function getImport()
