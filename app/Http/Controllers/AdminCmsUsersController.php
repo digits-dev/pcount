@@ -80,23 +80,23 @@ class AdminCmsUsersController extends CBController {
 	}
     public function actionButtonSelected($id_selected,$button_name) {
         //Your code here
+        $status = 'ACTIVE';
         switch ($button_name) {
             case 'set_status_ACTIVE':
-                User::whereIn('id',$id_selected)->update([
-                    'status'=>'ACTIVE',
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+                $status = 'ACTIVE';
                 break;
             case 'set_status_INACTIVE':
-                User::whereIn('id',$id_selected)->update([
-                    'status'=>'INACTIVE',
-                    'updated_at' => date('Y-m-d H:i:s')
-                ]);
+                $status = 'INACTIVE';
                 break;
             default:
                 # code...
                 break;
         }
+
+        User::whereIn('id',$id_selected)->update([
+            'status'=>$status,
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
     }
 
     public function getImport()

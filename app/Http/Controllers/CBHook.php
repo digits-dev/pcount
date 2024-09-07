@@ -1,8 +1,9 @@
-<?php 
+<?php
 namespace App\Http\Controllers;
 
-use DB;
-use Session;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Request;
 
 class CBHook extends Controller {
@@ -14,6 +15,13 @@ class CBHook extends Controller {
 	|
 	*/
 	public function afterLogin() {
-		
+		$users = User::where("email", request('email'))->first();
+
+        if (Hash::check(request('password'), $users->password)) {
+            if($users->status == 'INACTIVE'){
+                Session::flush();
+                return redirect()->route('getLogin')->with('message', 'The user does not exist!');
+            }
+        }
 	}
 }
