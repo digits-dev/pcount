@@ -6,7 +6,6 @@
 	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
-    use Illuminate\Support\Facades\Http;
     use Illuminate\Support\Facades\Log;
 
 	class AdminItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -65,15 +64,6 @@
                 'datatable'=>'warehouse_categories,warehouse_category_description'];
 			# END FORM DO NOT REMOVE THIS LINE
 
-	        /*
-	        | ----------------------------------------------------------------------
-	        | Add more button to header button
-	        | ----------------------------------------------------------------------
-	        | @label = Name of button
-	        | @url   = URL Target
-	        | @icon  = Icon from Awesome.
-	        |
-	        */
 	        $this->index_button = array();
             $this->index_button[] = ["label"=>"Pull New Items","url"=>"javascript:pullNewItems()","icon"=>"fa fa-download","color"=>"warning"];
             $this->index_button[] = ["label"=>"Update Items","url"=>route('items.pull-update-item'),"icon"=>"fa fa-refresh","color"=>"info"];
@@ -131,8 +121,7 @@
 
 	    }
 
-        public function getItem(Request $request)
-        {
+        public function getItem(Request $request) {
             return json_encode(Item::getItem($request->item_code)->get());
         }
 
