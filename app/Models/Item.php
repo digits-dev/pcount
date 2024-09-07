@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Item extends Model
 {
@@ -43,8 +44,7 @@ class Item extends Model
             'items.warehouse_categories_id as wh_category_id');
     }
 
-    public static function boot()
-    {
+    public static function boot() {
         parent::boot();
         static::creating(function($model) {
             $model->created_at = date('Y-m-d H:i:s');
@@ -57,5 +57,9 @@ class Item extends Model
         static::deleting(function($model) {
             $model->deleted_at = date('Y-m-d H:i:s');
         });
-   }
+    }
+
+    public function itemWarehouseCategory() : BelongsTo {
+        return $this->belongsTo(WarehouseCategory::class, 'warehouse_categories_id', 'id');
+    }
 }

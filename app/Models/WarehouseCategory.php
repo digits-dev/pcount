@@ -18,8 +18,7 @@ class WarehouseCategory extends Model
         'status',
     ];
 
-    public static function boot()
-    {
+    public static function boot() {
         parent::boot();
         static::creating(function($model) {
             $model->created_at = date('Y-m-d H:i:s');
@@ -28,10 +27,9 @@ class WarehouseCategory extends Model
         static::updating(function($model) {
             $model->updated_at = date('Y-m-d H:i:s');
         });
-   }
+    }
 
-   public function scopeWithCategory($query, $category)
-    {
+    public function scopeWithCategory($query, $category) {
         return $query->where('warehouse_category_description', $category)->first();
     }
 }
