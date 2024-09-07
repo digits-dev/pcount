@@ -141,30 +141,14 @@
 
             $data = [];
             $data['page_title'] = 'Count Details';
-            $data['header'] = CountHeader::where('count_headers.id',$id)
-            ->join('count_types','count_headers.count_types_id','count_types.id')
-            ->join('warehouse_categories','count_headers.warehouse_categories_id','warehouse_categories.id')
-            ->leftJoin('cms_users as scanby','count_headers.created_by','scanby.id')
-            ->leftJoin('cms_users as verifyby','count_headers.updated_by','verifyby.id')
-            ->select(
-                'count_headers.id',
-                'count_types.count_type_code',
-                'count_headers.category_tag_number',
-                'warehouse_categories.warehouse_category_description',
-                'count_headers.total_qty',
-                'scanby.name as scan_by',
-                'count_headers.created_at as scan_at',
-                'verifyby.name as verify_by',
-                'count_headers.updated_at as verify_at'
-            )->first();
+            $data['details'] = CountHeader::getDetail($id)->with([
+                'countType',
+                'warehouseCategory',
+                'lines',
+                'lines.item',
+                'lines.item.itemWarehouseCategory'
+            ])->first();
 
-            $data['items'] = CountLine::where('count_lines.count_headers_id',$id)
-            ->join('items','count_lines.item_code','items.digits_code')
-            ->join('warehouse_categories','items.warehouse_categories_id','warehouse_categories.id')
-            ->select('count_lines.*','items.item_description','warehouse_categories.warehouse_category_description')
-            ->get();
-
-            $data['sku_count'] = CountLine::where('count_lines.count_headers_id',$id)->count();
             return view('counter.detail',$data);
         }
 
@@ -176,30 +160,14 @@
 
             $data = [];
             $data['page_title'] = 'Print Count Details';
-            $data['header'] = CountHeader::where('count_headers.id',$id)
-            ->join('count_types','count_headers.count_types_id','count_types.id')
-            ->join('warehouse_categories','count_headers.warehouse_categories_id','warehouse_categories.id')
-            ->leftJoin('cms_users as scanby','count_headers.created_by','scanby.id')
-            ->leftJoin('cms_users as verifyby','count_headers.updated_by','verifyby.id')
-            ->select(
-                'count_headers.id',
-                'count_types.count_type_code',
-                'count_headers.category_tag_number',
-                'warehouse_categories.warehouse_category_description',
-                'count_headers.total_qty',
-                'scanby.name as scan_by',
-                'count_headers.created_at as scan_at',
-                'verifyby.name as verify_by',
-                'count_headers.updated_at as verify_at'
-            )->first();
+            $data['details'] = CountHeader::getDetail($id)->with([
+                'countType',
+                'warehouseCategory',
+                'lines',
+                'lines.item',
+                'lines.item.itemWarehouseCategory'
+            ])->first();
 
-            $data['items'] = CountLine::where('count_lines.count_headers_id',$id)
-            ->join('items','count_lines.item_code','items.digits_code')
-            ->join('warehouse_categories','items.warehouse_categories_id','warehouse_categories.id')
-            ->select('count_lines.*','items.item_description','warehouse_categories.warehouse_category_description')
-            ->get();
-
-            $data['sku_count'] = CountLine::where('count_lines.count_headers_id',$id)->count();
             CountHeader::where('count_headers.id',$id)->update(['print_flag'=>1]);
             return view('counter.print',$data);
         }

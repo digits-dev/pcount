@@ -55,32 +55,7 @@ class CountExport implements FromQuery, WithHeadings, WithMapping
 
     public function query()
     {
-        $counts = CountHeader::query()
-            ->leftJoin('count_types','count_headers.count_types_id','=','count_types.id')
-            ->leftJoin('warehouse_categories','count_headers.warehouse_categories_id','warehouse_categories.id')
-            ->leftJoin('cms_users as scanby','count_headers.created_by','scanby.id')
-            ->leftJoin('cms_users as verifyby','count_headers.updated_by','verifyby.id')
-            ->leftJoin('count_lines','count_headers.id','=','count_lines.count_headers_id')
-            ->leftJoin('items','count_lines.item_code','=','items.digits_code')
-            ->leftJoin('warehouse_categories as item_category','items.warehouse_categories_id','=','item_category.id')
-            ->select(
-                'count_headers.id',
-                'count_types.count_type_code',
-                'count_headers.category_tag_number',
-                'warehouse_categories.warehouse_category_description as count_category',
-                'count_headers.total_qty',
-                'scanby.name as scan_by',
-                'count_headers.created_at as scan_at',
-                'verifyby.name as verify_by',
-                'count_headers.updated_at as verify_at',
-                'count_lines.item_code',
-                'count_lines.qty',
-                'count_lines.revised_qty',
-                'count_lines.line_color',
-                'count_lines.line_remarks',
-                'items.item_description',
-                'item_category.warehouse_category_description as item_category'
-            )->whereNull('count_headers.deleted_at')->whereNull('count_lines.deleted_at');
+        $counts = CountHeader::query()->getExport();
 
         if(in_array(CRUDBooster::myPrivilegeName(), ["Scanner","Counter"])){
             $counts->where('count_headers.created_by',CRUDBooster::myId());
