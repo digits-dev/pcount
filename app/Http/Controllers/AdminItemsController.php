@@ -91,7 +91,8 @@
 
             foreach ($newItems['data'] ?? [] as $key => $value) {
                 try {
-                    Item::firstOrCreate(['digits_code'=>$value->digits_code],$value);
+                    Item::firstOrCreate(['digits_code'=>$value['digits_code']],
+                        $value);
                 } catch (\Exception $e) {
                     Log::error($e->getMessage());
                 }
