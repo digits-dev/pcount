@@ -89,9 +89,9 @@
             //pull new items from api
             $newItems = $this->getApiData(config('item-api.api_create_item_url'));
 
-            foreach ($newItems['data'] as $key => $value) {
+            foreach ($newItems['data'] ?? [] as $key => $value) {
                 try {
-                    Item::create($value);
+                    Item::firstOrCreate(['digits_code'=>$value->digits_code],$value);
                 } catch (\Exception $e) {
                     Log::error($e->getMessage());
                 }
@@ -106,9 +106,9 @@
 
         public function getUpdateItem(){
             //pull updated items from api
-            $newItems = $this->getApiData(config('item-api.api_update_item_url'));
+            $updatedItems = $this->getApiData(config('item-api.api_update_item_url'));
 
-            foreach ($newItems['data'] as $key => $value) {
+            foreach ($updatedItems['data'] ?? [] as $key => $value) {
                 try {
                     Item::where('digits_code',$value->digits_code)
                         ->update($value);

@@ -2,7 +2,6 @@
 
 namespace App\Traits;
 
-use App\Models\Brand;
 use Illuminate\Support\Facades\Http;
 
 trait ItemTrait
@@ -21,7 +20,10 @@ trait ItemTrait
             'X-Authorization-Token' => $xAuthorizationToken,
             'X-Authorization-Time' => $xAuthorizationTime,
             'User-Agent' => $userAgent
-        ])->get($url);
+        ])->get($url,[
+            'page' => 1,
+			'limit' => 1000,
+        ]);
 
         return json_decode($apiItems->body(), true);
     }
