@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 trait ItemTrait
 {
-    public function getApiData($url){
+    public function getApiData($url, $parameters=[]){
         $secretKey = config('item-api.secret_key');
         $uniqueString = time();
         $userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -23,6 +23,8 @@ trait ItemTrait
         ])->get($url,[
             'page' => 1,
 			'limit' => 1000,
+            'datefrom' => $parameters['datefrom'].' 00:00:00',
+            'dateto' => $parameters['dateto'].' 23:59:59'
         ]);
 
         return json_decode($apiItems->body(), true);

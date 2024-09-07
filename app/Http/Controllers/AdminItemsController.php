@@ -75,8 +75,59 @@
 	        |
 	        */
 	        $this->index_button = array();
-            $this->index_button[] = ["label"=>"Pull New Items","url"=>route('items.pull-new-item'),"icon"=>"fa fa-download","color"=>"warning"];
+            $this->index_button[] = ["label"=>"Pull New Items","url"=>"javascript:pullNewItems()","icon"=>"fa fa-download","color"=>"warning"];
             $this->index_button[] = ["label"=>"Update Items","url"=>route('items.pull-update-item'),"icon"=>"fa fa-refresh","color"=>"info"];
+
+            $this->script_js = NULL;
+			$this->script_js = "
+				function pullNewItems() {
+					$('#modal-pull-new-items').modal('show');
+				}
+                $(document).ready(function() {
+                    $('.dateInput').datepicker({
+                        format: 'yyyy-mm-dd',
+                        autoclose: true,
+                        todayHighlight: true
+                    }).on('changeDate', function(e) {
+                        const date = e.format('yyyy-mm-dd');
+                        console.log(date);
+                    });
+                });
+			";
+
+	        $this->post_index_html = null;
+			$this->post_index_html = "
+			<div class='modal fade' tabindex='-1' role='dialog' id='modal-pull-new-items'>
+				<div class='modal-dialog'>
+					<div class='modal-content'>
+						<div class='modal-header'>
+							<button class='close' aria-label='Close' type='button' data-dismiss='modal'>
+								<span aria-hidden='true'>×</span></button>
+							<h4 class='modal-title'><i class='fa fa-download'></i> Pull New Items</h4>
+						</div>
+
+						<form method='get' target='_blank' action=".route('items.pull-new-item').">
+                        <input type='hidden' name='_token' value=".csrf_token().">
+                        ".CRUDBooster::getUrlParameters()."
+                        <div class='modal-body'>
+                            <div class='form-group'>
+                                <label>Date From</label>
+                                <input type='text' name='datefrom' class='form-control dateInput' required />
+                            </div>
+                            <div class='form-group'>
+                                <label>Date To</label>
+                                <input type='text' name='dateto' class='form-control dateInput' required />
+                            </div>
+						</div>
+						<div class='modal-footer' align='right'>
+                            <button class='btn btn-default' type='button' data-dismiss='modal'>Close</button>
+                            <button class='btn btn-primary btn-submit' type='submit'>Submit</button>
+                        </div>
+                    </form>
+					</div>
+				</div>
+			</div>
+			";
 
 	    }
 
@@ -85,9 +136,20 @@
             return json_encode(Item::getItem($request->item_code)->get());
         }
 
-        public function getNewItem(){
+        public function getNewItem(Request $request){
+
+            $request->validate([
+                'datefrom' => ['required', 'date_format:Y-m-d', 'before:dateto'],
+                'dateto'   => ['required', 'date_format:Y-m-d', 'after:datefrom'],
+            ], [
+                'datefrom.before' => 'The datefrom must be before the dateto.',
+                'dateto.after'    => 'The dateto must be after the datefrom.',
+            ]);
             //pull new items from api
-            $newItems = $this->getApiData(config('item-api.api_create_item_url'));
+            $newItems = $this->getApiData(config('item-api.api_create_item_url'), [
+                'datefrom' => $request->datefrom,
+                'dateto'   => $request->dateto,
+            ]);
 
             foreach ($newItems['data'] ?? [] as $key => $value) {
                 try {
