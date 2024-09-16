@@ -127,6 +127,7 @@ use Illuminate\Support\Facades\Validator;
         }
 
         public function getNewItem(Request $request){
+
             $validation = Validator::make($request->all(), [
                 'datefrom' => ['required', 'date_format:Y-m-d', 'before:dateto'],
                 'dateto'   => ['required', 'date_format:Y-m-d', 'after:datefrom'],
@@ -136,10 +137,10 @@ use Illuminate\Support\Facades\Validator;
             ]);
 
             if($validation->fails()){
-                return response([
+                return redirect()->back()->with([
                     'message_type'=>"danger",
                     'message'=> $validation->errors()
-                ],402);
+                ]);
             }
             //pull new items from api
             $newItems = $this->getApiData(config('item-api.api_create_item_url'), [
