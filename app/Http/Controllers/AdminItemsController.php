@@ -7,6 +7,7 @@
 	use DB;
 	use CRUDBooster;
     use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 	class AdminItemsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -126,14 +127,20 @@
         }
 
         public function getNewItem(Request $request){
-
-            $request->validate([
+            $validation = Validator::make($request->all(), [
                 'datefrom' => ['required', 'date_format:Y-m-d', 'before:dateto'],
                 'dateto'   => ['required', 'date_format:Y-m-d', 'after:datefrom'],
             ], [
                 'datefrom.before' => 'The datefrom must be before the dateto.',
                 'dateto.after'    => 'The dateto must be after the datefrom.',
             ]);
+
+            if($validation->fails()){
+                return response([
+                    'message_type'=>"danger",
+                    'message'=> $validation->errors()
+                ],402);
+            }
             //pull new items from api
             $newItems = $this->getApiData(config('item-api.api_create_item_url'), [
                 'datefrom' => $request->datefrom,
