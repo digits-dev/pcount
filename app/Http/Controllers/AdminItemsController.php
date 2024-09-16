@@ -139,7 +139,7 @@ use Illuminate\Support\Facades\Validator;
             if($validation->fails()){
                 return redirect()->back()->with([
                     'message_type'=>"danger",
-                    'message'=> $validation->errors()
+                    'message'=> $validation->getMessageBag()
                 ]);
             }
             //pull new items from api
