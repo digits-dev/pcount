@@ -83,10 +83,10 @@ class AdminCmsUsersController extends CBController {
         $details = ['updated_at' => date('Y-m-d H:i:s')];
         switch ($button_name) {
             case 'set_status_ACTIVE':
-                $$details['status'] = 'ACTIVE';
+                $details['status'] = 'ACTIVE';
                 break;
             case 'set_status_INACTIVE':
-                $$details['status'] = 'INACTIVE';
+                $details['status'] = 'INACTIVE';
                 break;
             default:
                 # code...
