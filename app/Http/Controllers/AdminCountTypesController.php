@@ -13,7 +13,7 @@
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "count_type_code";
 			$this->limit = "20";
-			$this->orderby = "count_type_description,asc";
+			$this->orderby = "created_at,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
@@ -55,7 +55,7 @@
 
 	    }
 
-	    public function hook_after_add($id) {
+	    public function hook_before_add(&$postdata) {
 	        //Your code here
             $postdata['created_by']=CRUDBooster::myId();
 	    }
