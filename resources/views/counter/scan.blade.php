@@ -340,7 +340,7 @@
             $("#count_activity").change(function () {
                 sel_activity = $(this).val();
                 $("#count_type").val(sel_activity);
-                $("#countActivity").text($(this).text());
+                $("#countActivity").text($("#count_activity option:selected").text());
 
                 $(".count_activity option:not(:selected)").prop('disabled', true);
                 $("#category").removeAttr('disabled');
