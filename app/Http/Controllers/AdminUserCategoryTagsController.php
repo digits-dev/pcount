@@ -4,9 +4,8 @@
     use App\Imports\UserCategoryTagImport;
     use App\Models\User;
     use App\Models\UserCategoryTag;
-    use Session;
-	use DB;
-	use CRUDBooster;
+    use crocodicstudio\crudbooster\helpers\CRUDBooster;
+    use DB;
     use Illuminate\Http\Request;
     use Maatwebsite\Excel\HeadingRowImport;
     use Maatwebsite\Excel\Imports\HeadingRowFormatter;
@@ -95,6 +94,12 @@
                     break;
             }
             UserCategoryTag::whereIn('id',$id_selected)->update($details);
+	    }
+
+        public function hook_query_index(&$query) {
+	        if(!CRUDBooster::isSuperadmin()){
+                $query->where('status', 'ACTIVE');
+            }
 	    }
 
 	    public function hook_before_add(&$postdata) {
