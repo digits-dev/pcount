@@ -98,7 +98,7 @@
 
         public function hook_query_index(&$query) {
 	        if(!CRUDBooster::isSuperadmin()){
-                $query->where('status', 'ACTIVE');
+                $query->where('user_category_tags.status', 'ACTIVE');
             }
 	    }
 
